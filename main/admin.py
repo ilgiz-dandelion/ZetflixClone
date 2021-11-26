@@ -1,4 +1,3 @@
-from django.contrib import admin
 
 from django.contrib import admin
 
@@ -16,9 +15,9 @@ class MovieAdmin(admin.ModelAdmin):
     inlines = [ImageInLine, ]
 
 
-admin.site.register(Category)
+admin.site.register(Genre)
 admin.site.register(Comment)
 admin.site.register(Likes)
-admin.site.register(Review)
 admin.site.register(Reply)
+admin.site.register(Rating)
 

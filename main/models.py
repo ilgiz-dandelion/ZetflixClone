@@ -4,7 +4,7 @@ from django.db import models
 from account.models import MyUser
 
 
-class Category(models.Model):
+class Genre(models.Model):
     slug = models.SlugField(max_length=50, primary_key=True)
     name = models.CharField(max_length=50, unique=True)
 
@@ -13,7 +13,8 @@ class Category(models.Model):
 
 
 class Movie(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='movie')
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='movies')
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='movies')
     title = models.CharField(max_length=100)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,16 +60,15 @@ class Likes(models.Model):
         return str(self.likes)
 
 
-class Review(models.Model):
+class Rating(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
-    description = models.CharField(max_length=200, null=True)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="reviews")
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], default=0)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="rating")
     active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.rating) + " | " + self.movie.name + " | " + str(self.user)
+        return str(self.rating) + " | " + self.movie.title + " | " + str(self.user)
 
 
 class Favorite(models.Model):

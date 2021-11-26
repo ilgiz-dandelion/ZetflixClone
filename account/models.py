@@ -4,6 +4,8 @@ from django.db import models
 
 
 class MyUserManager(BaseUserManager):
+    use_in_migrations =True
+
     def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError('Email is required')
@@ -29,7 +31,6 @@ class MyUser(AbstractUser):
     username = None
     email = models.EmailField(max_length=100, primary_key=True)
     is_active = models.BooleanField(default=False)
-    name = models.CharField(max_length=100, blank=True, null=True)
     activation_code = models.CharField(max_length=255, blank=True)
 
     USERNAME_FIELD = 'email'
