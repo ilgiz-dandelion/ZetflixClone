@@ -6,8 +6,10 @@ from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from main.serializers import *
+from .parsing import main
 
 
 class PermissionMixin:
@@ -57,8 +59,8 @@ class MovieViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def favorite(self, request, pk=None):
-        post = self.get_object()
-        obj, created = Favorite.objects.get_or_create(user=request.user, post=post, )
+        movie = self.get_object()
+        obj, created = Favorite.objects.get_or_create(user=request.user, movie=movie, )
         if not created:
             obj.favorite = not obj.favorite
             obj.save()
@@ -75,19 +77,32 @@ class MovieImagesViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer
 
 
-class CommentViewSet(PermissionMixin, viewsets.ModelViewSet):
+class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
 
-class LikesViewSet(PermissionMixin, viewsets.ModelViewSet):
+class LikesViewSet(viewsets.ModelViewSet):
     queryset = Likes.objects.all()
     serializer_class = LikesSerializer
 
 
-class RatingViewSet(PermissionMixin, viewsets.ModelViewSet):
+class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+
+class ParsingView(APIView):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 10
+
+    def get(self, request):
+        parsing = main()
+
+        serializer = ParsingSerializer(instance=parsing, many=True)
+        return Response(serializer.data)
+
+
 
 
 
