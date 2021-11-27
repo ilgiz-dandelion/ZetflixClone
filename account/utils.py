@@ -1,5 +1,8 @@
 from django.core.mail import send_mail
+from zetflix_api._celery import app
 
+
+@app.task
 def send_activation_code(email, activation_code):
 
     message = f"""Спасибо за регистрацию.Активируйте свой аккаунт по ссылке:

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     #libs
     'rest_framework',
     'rest_framework.authtoken',
+    'django_rest_passwordreset',
     'django_filters',
     'rest_framework_simplejwt',
     'drf_yasg',
@@ -160,3 +161,6 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
