@@ -12,15 +12,15 @@ from main.serializers import *
 from .parsing import main
 
 
-class PermissionMixin:
-    def get_permissions(self):
-        if self.action in ['create','update', 'partial_update', 'destroy', 'favorites', 'favorite', ]:
-            permissions = [IsAdminUser, ]
-        elif self.action == ['filter','search', ] :
-            permissions = [AllowAny, ]
-        else:
-            permissions = []
-        return [permission() for permission in permissions]
+# class PermissionMixin:
+#     def get_permissions(self):
+#         if self.action in ['create', 'update', 'partial_update', 'destroy', 'favorites', 'favorite', ]:
+#             permissions = [IsAdminUser, ]
+#         elif self.action == ['filter','search', ] :
+#             permissions = [AllowAny, ]
+#         else:
+#             permissions = []
+#         return [permission() for permission in permissions]
 
 
 class GenreListView(generics.ListAPIView):
@@ -32,8 +32,9 @@ class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     queryset_any = Favorite.objects.all()
+    permission_classes = [IsAdminUser, ]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def filter(self, request, pk=None):
         queryset = self.get_queryset()
         start_date = timezone.now() - timedelta(days=1)
@@ -41,16 +42,23 @@ class MovieViewSet(viewsets.ModelViewSet):
         serializer = MovieSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def filter_genre_comedy(self, request):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(genre='comedy')
+        serializer = MovieSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def search(self, request, pk=None):
         q = request.query_params.get('q')
         queryset = self.get_queryset()
-        queryset = queryset.filter(Q(title__icontains=q) |
+        queryset = queryset.filter(Q|
                                    Q(description__icontains=q))
         serializer = MovieSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def favorites(self, request):
         queryset = Favorite.objects.all()
         queryset = queryset.filter(user=request.user)
@@ -75,26 +83,28 @@ class MovieViewSet(viewsets.ModelViewSet):
 class MovieImagesViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
+    permission_classes = [IsAdminUser, ]
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-
+    permission_classes = [IsAuthenticated, ]
 
 class LikesViewSet(viewsets.ModelViewSet):
     queryset = Likes.objects.all()
     serializer_class = LikesSerializer
+    permission_classes = [IsAuthenticated, ]
 
 
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+    permission_classes = [IsAuthenticated, ]
+
 
 class ParsingView(APIView):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 10
+    permission_classes = [AllowAny, ]
 
     def get(self, request):
         parsing = main()
