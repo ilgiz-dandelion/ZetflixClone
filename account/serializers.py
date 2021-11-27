@@ -24,7 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         email = validated_data.get('email')
         password = validated_data.get('password')
         user = MyUser.objects.create_user(email=email, password=password)
-        send_activation_code(email=user.email, activation_code=str(user.activation_code))
+        send_activation_code.delay(email=user.email, activation_code=str(user.activation_code))
         return user
 
 
@@ -54,3 +54,10 @@ class LoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = MyUser
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
