@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics, viewsets, status
@@ -27,6 +27,11 @@ class GenreListView(generics.ListAPIView):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
+class MovieListView(generics.ListAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['genre', ]
 
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
@@ -43,18 +48,10 @@ class MovieViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
-    def filter_genre_comedy(self, request):
-        queryset = self.get_queryset()
-        queryset = queryset.filter(genre='comedy')
-        serializer = MovieSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def search(self, request, pk=None):
         q = request.query_params.get('q')
         queryset = self.get_queryset()
-        queryset = queryset.filter(Q|
-                                   Q(description__icontains=q))
+        queryset = queryset.filter(Q(title__icontains=q) | Q(description__icontains=q))
         serializer = MovieSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -83,8 +80,6 @@ class MovieViewSet(viewsets.ModelViewSet):
 class MovieImagesViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
-    permission_classes = [IsAdminUser, ]
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
@@ -111,6 +106,9 @@ class ParsingView(APIView):
 
         serializer = ParsingSerializer(instance=parsing, many=True)
         return Response(serializer.data)
+
+
+
 
 
 
