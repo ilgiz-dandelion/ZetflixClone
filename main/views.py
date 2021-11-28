@@ -12,15 +12,13 @@ from main.serializers import *
 from .parsing import main
 
 
-# class PermissionMixin:
-#     def get_permissions(self):
-#         if self.action in ['create', 'update', 'partial_update', 'destroy', 'favorites', 'favorite', ]:
-#             permissions = [IsAdminUser, ]
-#         elif self.action == ['filter','search', ] :
-#             permissions = [AllowAny, ]
-#         else:
-#             permissions = []
-#         return [permission() for permission in permissions]
+class PermissionMixin:
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy', ]:
+            permissions = [IsAdminUser, ]
+        else:
+            permissions = [IsAuthenticated, ]
+        return [permission() for permission in permissions]
 
 
 class GenreListView(generics.ListAPIView):
@@ -33,11 +31,11 @@ class MovieListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['genre', ]
 
-class MovieViewSet(viewsets.ModelViewSet):
+
+class MovieViewSet(PermissionMixin, viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     queryset_any = Favorite.objects.all()
-    permission_classes = [IsAdminUser, ]
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def filter(self, request, pk=None):

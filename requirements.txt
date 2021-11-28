@@ -11,3 +11,4 @@ celery
 redis
 bs4
 requests
+django-widget-tweaks
