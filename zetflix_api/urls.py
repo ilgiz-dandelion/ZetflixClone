@@ -45,6 +45,7 @@ urlpatterns = [
     path('', schema_view.with_ui()),
     path('admin/', admin.site.urls),
     path('api/v1/genres/', GenreListView.as_view()),
+    path('api/v1/movie/', MovieListView.as_view()),
     path('api/v1/', include(router.urls)),
     path('api/v1/account/', include('account.urls')),
     path('api/v1/imdb/', ParsingView.as_view()),
