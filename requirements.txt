@@ -12,3 +12,4 @@ redis
 bs4
 requests
 django-widget-tweaks
+django-rest-framework-social-oauth2
