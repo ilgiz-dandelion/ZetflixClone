@@ -84,7 +84,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class LikesSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(format='%d/%m/%Y %H:%M:%S', read_only=True)
+    created = serializers.DateTimeField(format='%d/%m/%Y %H:%M:%S', read_only=True)
     author = serializers.ReadOnlyField(source='author.email')
 
     class Meta:

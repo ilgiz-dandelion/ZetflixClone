@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from main.serializers import *
 from .parsing import main
-
+from .permissions import IsAuthorPermission
 
 class PermissionMixin:
     def get_permissions(self):
@@ -82,18 +82,18 @@ class MovieImagesViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthorPermission ]
 
 class LikesViewSet(viewsets.ModelViewSet):
     queryset = Likes.objects.all()
     serializer_class = LikesSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthorPermission,]
 
 
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthorPermission, ]
 
 
 class ParsingView(APIView):
